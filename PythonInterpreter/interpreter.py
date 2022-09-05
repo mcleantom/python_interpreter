@@ -3,6 +3,7 @@ __all__ = ["Interpreter"]
 class Interpreter:
     def __init__(self):
         self.stack = []
+        self.environment = {}
 
     def LOAD_VALUE(self, number):
         self.stack.append(number)
@@ -17,6 +18,25 @@ class Interpreter:
         total = first_num + second_num
         self.stack.append(total)
 
+    def STORE_NAME(self, name):
+        val = self.stack.pop()
+        self.environment[name] = val
+
+    def LOAD_NAME(self, name):
+        val = self.environment[name]
+        self.stack.append(val)
+
+    def parse_argument(self, instruction, argument, what_to_execute):
+        numbers = ["LOAD_VALUE"]
+        names = ["LOAD_NAME", "STORE_NAME"]
+
+        if instruction in numbers:
+            argument = what_to_execute["numbers"][argument]
+        elif instruction in names:
+            argument = what_to_execute["names"][argument]
+
+        return argument
+
     def run_code(self, what_to_execute):
         instructions = what_to_execute["instructions"]
         numbers = what_to_execute["numbers"]
@@ -28,3 +48,7 @@ class Interpreter:
                 self.ADD_TWO_VALUES()
             elif instruction == "PRINT_ANSWER":
                 self.PRINT_ANSWER()
+            elif instruction == "STORE_NAME":
+                self.STORE_NAME(argument)
+            elif instruction == "LOAD_NAME":
+                self.LOAD_NAME(argument)
